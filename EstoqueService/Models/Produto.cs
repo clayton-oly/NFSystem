@@ -1,4 +1,4 @@
-﻿namespace EstoqueService.Models
+﻿namespace FaturamentoService.Models
 {
     public class Produto
     {

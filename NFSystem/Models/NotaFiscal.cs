@@ -1,4 +1,4 @@
-﻿namespace NFSystem.Models
+﻿namespace FaturamentoService.Models
 {
     public class NotaFiscal
     {
