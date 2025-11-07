@@ -7,9 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="DTOs\" />
     <Folder Include="Interfaces\" />
+    <Folder Include="Services\" />
     <Folder Include="Repository\" />
   </ItemGroup>
 
