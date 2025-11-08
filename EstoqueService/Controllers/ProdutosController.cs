@@ -1,4 +1,5 @@
 ﻿using EstoqueService.DTOs;
+using EstoqueService.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EstoqueService.Controllers
@@ -7,39 +8,33 @@ namespace EstoqueService.Controllers
     [ApiController]
     public class ProdutosController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<IEnumerable<ProdutoOutputDTO>> Get()
+        private readonly IProdutoService _produtoService;
+
+        public ProdutosController(IProdutoService produtoService)
         {
-            return new List<ProdutoOutputDTO>
-            {
-                new ProdutoOutputDTO { Id = 1, Codigo = 101, Descricao = "Produto 1", Saldo = 10 },
-                new ProdutoOutputDTO { Id = 2, Codigo = 102, Descricao = "Produto 2", Saldo = 20 }
-            };
+            _produtoService = produtoService;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ProdutoOutputDTO>>> Get()
+        {
+            var produtos = await _produtoService.GetAllProdutos();
+            return Ok(produtos);
         }
 
         [HttpPost]
-        public ActionResult Post([FromBody] ProdutoInputDTO produto)
+        public async Task<ActionResult> Post([FromBody] ProdutoInputDTO produto)
         {
-            //return CreatedAtAction(nameof(Get), new { id = produto.Id }, produto);
-            return Ok();
+            await _produtoService.CriarProdutoAsync(produto);
+            return CreatedAtAction(nameof(Get), produto);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] ProdutoInputDTO produto)
-        {
-            //if (id != produto.Id)
-            //{
-            //    return BadRequest();
-            //}
-
-            return NoContent();
-        }
 
         [HttpPatch("{id}/atualizar-saldo")]
-        public IActionResult AtualizarSaldo(int id, [FromBody] decimal novoSaldo)
+        public async Task<ActionResult> AtualizarSaldo(int id, [FromBody] AtualizarSaldoInputDTO atualizarSaldoDTO)
         {
+            await _produtoService.AtualizarSaldo(id, atualizarSaldoDTO.Quantidade);
             return NoContent();
         }
-
     }
 }
