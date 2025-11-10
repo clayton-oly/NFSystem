@@ -89,5 +89,9 @@ namespace FaturamentoService.Services
             response.EnsureSuccessStatusCode();
         }
 
+        public string GetProximoNumero()
+        {
+            return _notaFiscalRepository.GetProximoNumero();
+        }
     }
 }

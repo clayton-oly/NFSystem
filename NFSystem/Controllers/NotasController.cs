@@ -1,5 +1,7 @@
 ﻿using FaturamentoService.DTOs;
+using FaturamentoService.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FaturamentoService.Controllers
 {
@@ -7,39 +9,41 @@ namespace FaturamentoService.Controllers
     [ApiController]
     public class NotasController : ControllerBase
     {
-        //GET /api/notas → listar notas
+        private readonly INotaFiscalService _notaFiscalService;
+
+        public NotasController(INotaFiscalService notaFiscalService)
+        {
+            _notaFiscalService = notaFiscalService;
+        }
+
         [HttpGet]
-        public ActionResult<IEnumerable<NotaFiscalOutputDTO>> Get()
+        public async Task<ActionResult<IEnumerable<NotaFiscalOutputDTO>>> Get()
         {
-            return Ok();
+            var notas = await _notaFiscalService.GetAll();
+            return Ok(notas);
         }
 
-        //POST /api/notas
         [HttpPost]
-        public ActionResult Post([FromBody] NotaFiscalInputDTO notaFiscal)
+        public async Task<ActionResult> Post([FromBody] NotaFiscalInputDTO notaFiscal)
         {
-            //return CreatedAtAction(nameof(Get), new { id = notaFiscal.Id }, notaFiscal);
-            return Ok();
+            await _notaFiscalService.CriarNotaAsync(notaFiscal);
+            return CreatedAtAction(nameof(Get), notaFiscal);
         }
 
-        //POST /api/notas/{id}/fechar
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] NotaFiscalInputDTO notaFiscal)
+        [HttpPatch("{id}/imprimir")]
+        public async Task<IActionResult> FecharNota(int id)
         {
-            //if (id != notaFiscal.Id)
-            //{
-            //    return BadRequest();
-            //}
+            var sucesso = await _notaFiscalService.FecharNotaAsync(id);
+            if (!sucesso) return BadRequest("Não foi possível fechar a nota.");
 
-            return NoContent();
+            return Ok("Nota fiscal fechada com sucesso.");
         }
 
-        [HttpPatch("{id}/atualizar-saldo")]
-        public IActionResult AtualizarSaldo(int id, [FromBody] decimal novoSaldo)
+        [HttpGet("proximo-numero")]
+        public IActionResult GetProximoNumero()
         {
-            return NoContent();
+            var proximoNumero = _notaFiscalService.GetProximoNumero();
+            return Ok(proximoNumero);
         }
-
-
     }
 }

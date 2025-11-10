@@ -17,6 +17,15 @@ builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 // Services
 builder.Services.AddScoped<IProdutoService, ProdutoService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("PermitirTudo", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod() 
+              .AllowAnyHeader();
+    });
+});
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -35,6 +44,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("PermitirTudo");
 
 app.UseHttpsRedirection();
 
