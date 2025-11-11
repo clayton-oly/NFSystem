@@ -1,7 +1,6 @@
 ﻿using FaturamentoService.DTOs;
 using FaturamentoService.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FaturamentoService.Controllers
 {
@@ -23,12 +22,31 @@ namespace FaturamentoService.Controllers
             return Ok(notas);
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<IEnumerable<NotaFiscalOutputDTO>>> GetById(int id)
+        {
+            var nota = await _notaFiscalService.GetByIdAsync(id);
+            return Ok(nota);
+        }
+
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] NotaFiscalInputDTO notaFiscal)
         {
             await _notaFiscalService.CriarNotaAsync(notaFiscal);
-            return CreatedAtAction(nameof(Get), notaFiscal);
+            return CreatedAtAction(nameof(GetById), notaFiscal);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] NotaFiscalInputDTO notaFiscal)
+        {
+            if (notaFiscal == null)
+                return BadRequest("Dados da nota fiscal inválidos.");
+
+            await _notaFiscalService.AtualizarNotaAsync(id, notaFiscal);
+
+            return NoContent();
+        }
+
 
         [HttpPatch("{id}/imprimir")]
         public async Task<IActionResult> FecharNota(int id)

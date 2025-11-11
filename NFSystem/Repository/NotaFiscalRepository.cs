@@ -20,6 +20,12 @@ namespace FaturamentoService.Repository
             await _context.SaveChangesAsync();
         }
 
+        public async Task UpdateAsync(NotaFiscal nota)
+        {
+            _context.NotasFiscais.Update(nota);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<NotaFiscal>> GetAll()
         {
             return await _context.NotasFiscais.ToListAsync();
@@ -36,15 +42,12 @@ namespace FaturamentoService.Repository
             await _context.SaveChangesAsync();
         }
 
-        public string GetProximoNumero()
+        public int GetProximoNumero()
         {
-            var ultimoNumero = _context.NotasFiscais
+            return _context.NotasFiscais
                 .OrderByDescending(n => n.Numero)
                 .Select(n => n.Numero)
                 .FirstOrDefault();
-
-            var proximo = ultimoNumero + 1;
-            return proximo.ToString();
         }
     }
 }

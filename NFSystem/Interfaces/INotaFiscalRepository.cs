@@ -8,6 +8,6 @@ namespace FaturamentoService.Interfaces
         Task<NotaFiscal> GetById(int id);
         Task Add(NotaFiscal notaFiscal);
         Task Update(NotaFiscal notaFiscal);
-        string GetProximoNumero();
+        int GetProximoNumero();
     }
 }

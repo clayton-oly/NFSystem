@@ -2,6 +2,7 @@
 using FaturamentoService.DTOs;
 using FaturamentoService.Interfaces;
 using FaturamentoService.Models;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -18,22 +19,6 @@ namespace FaturamentoService.Services
             _httpClient.BaseAddress = new Uri("https://localhost:5000");
         }
 
-        //public async Task<NotaFiscal> CriarNotaAsync(NotaFiscal novaNota)
-        //{
-        //    int ultimoNumero = await _context.NotasFiscais
-        //        .OrderByDescending(n => n.Numero)
-        //        .Select(n => n.Numero)
-        //        .FirstOrDefaultAsync();
-
-        //    novaNota.Numero = ultimoNumero + 1; // Se não tiver nenhuma, será 0 + 1 = 1
-        //    novaNota.Status = "Aberta";
-
-        //    _context.NotasFiscais.Add(novaNota);
-        //    await _context.SaveChangesAsync();
-
-        //    return novaNota;
-        //}
-
         public async Task CriarNotaAsync(NotaFiscalInputDTO notaFiscalInputDTO)
         {
             var nota = new NotaFiscal
@@ -47,8 +32,31 @@ namespace FaturamentoService.Services
                 }).ToList()
             };
 
+            nota.Numero = GetProximoNumero();
+
             await _notaFiscalRepository.Add(nota);
         }
+        public async Task AtualizarNotaAsync(int id, NotaFiscalInputDTO dto)
+        {
+            var notaExistente = await _notaFiscalRepository.GetById(id);
+
+            if (notaExistente == null)
+                throw new KeyNotFoundException("Nota não encontrada.");
+
+
+            notaExistente.Itens.Clear();
+            foreach (var itemDto in dto.Itens)
+            {
+                notaExistente.Itens.Add(new ItemNota
+                {
+                    ProdutoId = itemDto.ProdutoId,
+                    Quantidade = itemDto.Quantidade
+                });
+            }
+
+            await _notaFiscalRepository.Update(notaExistente);
+        }
+
 
         public async Task<IEnumerable<NotaFiscalOutputDTO>> GetAll()
         {
@@ -59,6 +67,26 @@ namespace FaturamentoService.Services
                 Numero = notaFiscal.Numero,
                 Status = notaFiscal.Status
             });
+        }
+
+        public async Task<NotaFiscalOutputDTO> GetByIdAsync(int id)
+        {
+            var nota = await _notaFiscalRepository.GetById(id);
+
+            if (nota == null)
+                throw new KeyNotFoundException("Nota fiscal não encontrada.");
+
+            return new NotaFiscalOutputDTO
+            {
+                Id = nota.Id,
+                Numero = nota.Numero,
+                Status = nota.Status,
+                Itens = nota.Itens.Select(i => new ItemNotaFiscalDTO
+                {
+                    ProdutoId = i.ProdutoId,
+                    Quantidade = i.Quantidade
+                }).ToList()
+            };
         }
 
         public async Task<bool> FecharNotaAsync(int id)
@@ -89,9 +117,11 @@ namespace FaturamentoService.Services
             response.EnsureSuccessStatusCode();
         }
 
-        public string GetProximoNumero()
+        public int GetProximoNumero()
         {
-            return _notaFiscalRepository.GetProximoNumero();
+            var ultimoNumero =  _notaFiscalRepository.GetProximoNumero();
+
+            return ultimoNumero + 1;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace EstoqueService.Models
         public int Saldo { get; set; }
 
 
-        [Timestamp]
-        public byte[] RowVersion { get; set; }
+        //[Timestamp]
+        //public byte[] RowVersion { get; set; }
     }
 }
