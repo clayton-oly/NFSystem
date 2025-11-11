@@ -1,3 +1,4 @@
+using EstoqueService.Middleware;
 using FaturamentoService.Data;
 using FaturamentoService.Interfaces;
 using FaturamentoService.Repository;
@@ -36,6 +37,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 // Configure the HTTP request pipeline.
 
