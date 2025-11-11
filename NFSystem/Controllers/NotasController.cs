@@ -48,13 +48,20 @@ namespace FaturamentoService.Controllers
         }
 
 
+
+
         [HttpPatch("{id}/imprimir")]
         public async Task<IActionResult> FecharNota(int id)
         {
-            var sucesso = await _notaFiscalService.FecharNotaAsync(id);
-            if (!sucesso) return BadRequest("Não foi possível fechar a nota.");
-
-            return Ok("Nota fiscal fechada com sucesso.");
+            try
+            {
+                var sucesso = await _notaFiscalService.FecharNotaAsync(id);
+                return Ok("Nota impressa com sucesso");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
         }
 
         [HttpGet("proximo-numero")]

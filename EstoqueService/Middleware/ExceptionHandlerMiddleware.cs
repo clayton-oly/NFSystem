@@ -28,7 +28,6 @@
             catch (Exception ex)
             {
                 context.Response.StatusCode = 500;
-                //await context.Response.WriteAsJsonAsync(new { message = "Erro interno." });
                 await context.Response.WriteAsJsonAsync(new { message = ex.Message});
             }
         }

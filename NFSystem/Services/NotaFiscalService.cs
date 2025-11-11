@@ -2,7 +2,6 @@
 using FaturamentoService.DTOs;
 using FaturamentoService.Interfaces;
 using FaturamentoService.Models;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -92,12 +91,29 @@ namespace FaturamentoService.Services
         public async Task<bool> FecharNotaAsync(int id)
         {
             var nota = await _notaFiscalRepository.GetById(id);
+
             if (nota == null || nota.Status != "Aberta")
                 return false;
 
+            var produtosComProblema = new List<string>();
+
             foreach (var item in nota.Itens)
             {
-                await AtualizarSaldoProdutoAsync(item.ProdutoId, item.Quantidade);
+                try
+                {
+                    await AtualizarSaldoProdutoAsync(item.ProdutoId, item.Quantidade);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    produtosComProblema.Add($"Produto {item.ProdutoId}: {ex.Message}");
+                }
+            }
+
+            if (produtosComProblema.Any())
+            {
+                throw new InvalidOperationException(
+                    $"Não foi possível fechar a nota devido a saldo insuficiente:\n{string.Join("\n", produtosComProblema)}"
+                );
             }
 
             nota.Status = "Fechada";
@@ -114,12 +130,19 @@ namespace FaturamentoService.Services
 
             var response = await _httpClient.PatchAsync($"/api/produtos/{produtoId}/atualizar-saldo", content);
 
-            response.EnsureSuccessStatusCode();
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var erro = JsonConvert.DeserializeObject<ErrorResponse>(responseBody);
+                throw new InvalidOperationException(erro?.Message);
+            }
         }
+
 
         public int GetProximoNumero()
         {
-            var ultimoNumero =  _notaFiscalRepository.GetProximoNumero();
+            var ultimoNumero = _notaFiscalRepository.GetProximoNumero();
 
             return ultimoNumero + 1;
         }

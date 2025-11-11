@@ -7,5 +7,6 @@ namespace EstoqueService.Interfaces
         Task<IEnumerable<ProdutoOutputDTO>> GetAllProdutos();
         Task CriarProdutoAsync(ProdutoInputDTO produto);
         Task AtualizarSaldo(int id, int novoSaldo);
+        Task<ProdutoOutputDTO> GetProdutoByIdAsync(int id);
     }
 }

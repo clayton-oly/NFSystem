@@ -1,4 +1,5 @@
-﻿using EstoqueService.DTOs;
+﻿using EstoqueService.Data;
+using EstoqueService.DTOs;
 using EstoqueService.Interfaces;
 using EstoqueService.Models;
 using Microsoft.EntityFrameworkCore;
@@ -53,7 +54,10 @@ namespace EstoqueService.Services
                 throw new ArgumentException("O saldo não pode ser negativo.");
 
             if (produto.Saldo < quantidade)
-                throw new Exception("Saldo insuficiente para atualizar.");
+                throw new InvalidOperationException(
+                    $"Não foi possível atualizar o saldo do produto '{produto.Descricao}'. " +
+                    $"Quantidade solicitada: {quantidade}, disponível em estoque: {produto.Saldo}."
+                );
 
             try
             {
@@ -64,6 +68,22 @@ namespace EstoqueService.Services
             {
                 throw new Exception("Conflito ao atualizar o saldo do produto. Outra operação alterou este produto simultaneamente. Tente novamente.");
             }
+        }
+
+        public Task<ProdutoOutputDTO> GetProdutoByIdAsync(int id)
+        {
+           var produto =  _produtoRepository.GetById(id);
+
+
+            var produtoOutputDTO = new ProdutoOutputDTO
+            {
+                Id = produto.Result.Id,
+                Descricao = produto.Result.Descricao,
+                Codigo = produto.Result.Codigo,
+                Saldo = produto.Result.Saldo
+            };
+
+            return Task.FromResult(produtoOutputDTO);
         }
     }
 }
