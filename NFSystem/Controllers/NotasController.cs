@@ -33,7 +33,7 @@ namespace FaturamentoService.Controllers
         public async Task<ActionResult> Post([FromBody] NotaFiscalInputDTO notaFiscal)
         {
             await _notaFiscalService.CriarNotaAsync(notaFiscal);
-            return CreatedAtAction(nameof(GetById), notaFiscal);
+            return Ok(new { message = "Nota cadastrada com sucesso" });
         }
 
         [HttpPut("{id}")]
@@ -49,14 +49,15 @@ namespace FaturamentoService.Controllers
 
 
 
-
         [HttpPatch("{id}/imprimir")]
         public async Task<IActionResult> FecharNota(int id)
         {
             try
             {
                 var sucesso = await _notaFiscalService.FecharNotaAsync(id);
-                return Ok("Nota impressa com sucesso");
+                if(!sucesso) return Ok(new { message = "Erro ao imprimir nota" });
+
+                return Ok(new { message = "Nota impressa com sucesso" });
             }
             catch (InvalidOperationException ex)
             {

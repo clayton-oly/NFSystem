@@ -93,7 +93,11 @@ namespace FaturamentoService.Services
             var nota = await _notaFiscalRepository.GetById(id);
 
             if (nota == null || nota.Status != "Aberta")
-                return false;
+                throw new InvalidOperationException(
+                    "A nota já esta fechada");
+
+            if (!nota.Itens.Any()) throw new InvalidOperationException(
+                    "Não foi possível fechar a nota devido a falta de produtos");
 
             var produtosComProblema = new List<string>();
 

@@ -34,7 +34,7 @@ namespace EstoqueService.Controllers
         public async Task<ActionResult> AtualizarSaldo(int id, [FromBody] AtualizarSaldoInputDTO atualizarSaldoDTO)
         {
             await _produtoService.AtualizarSaldo(id, atualizarSaldoDTO.Quantidade);
-            return NoContent();
+            return Ok("produto atualizado com sucesso");
         }
     }
 }
