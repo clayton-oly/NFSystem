@@ -52,17 +52,11 @@ namespace FaturamentoService.Controllers
         [HttpPatch("{id}/imprimir")]
         public async Task<IActionResult> FecharNota(int id)
         {
-            try
-            {
-                var sucesso = await _notaFiscalService.FecharNotaAsync(id);
-                if(!sucesso) return Ok(new { message = "Erro ao imprimir nota" });
+            var sucesso = await _notaFiscalService.FecharNotaAsync(id);
+            if (!sucesso) return Ok(new { message = "Erro ao imprimir nota" });
 
-                return Ok(new { message = "Nota impressa com sucesso" });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            return Ok(new { message = "Nota impressa com sucesso" });
+
         }
 
         [HttpGet("proximo-numero")]

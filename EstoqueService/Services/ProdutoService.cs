@@ -1,5 +1,4 @@
-﻿using EstoqueService.Data;
-using EstoqueService.DTOs;
+﻿using EstoqueService.DTOs;
 using EstoqueService.Interfaces;
 using EstoqueService.Models;
 using Microsoft.EntityFrameworkCore;

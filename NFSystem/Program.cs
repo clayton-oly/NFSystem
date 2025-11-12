@@ -1,4 +1,4 @@
-using EstoqueService.Middleware;
+using FaturamentoService.Middleware;
 using FaturamentoService.Data;
 using FaturamentoService.Interfaces;
 using FaturamentoService.Repository;

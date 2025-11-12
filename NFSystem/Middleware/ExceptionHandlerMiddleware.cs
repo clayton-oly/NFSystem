@@ -1,4 +1,4 @@
-﻿namespace EstoqueService.Middleware
+﻿namespace FaturamentoService.Middleware
 {
     public class ExceptionHandlerMiddleware
     {
